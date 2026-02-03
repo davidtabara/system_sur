@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    
+    <title>SOPORTE_IT // MADRID_SUR</title>
+    <meta name="description" content="Soporte Técnico Informático Avanzado. Diagnóstico IA, Reparación y Gaming. Getafe, Leganés, Fuenlabrada.">
+    <meta property="og:title" content="SystemSur - Soporte Técnico Avanzado">
+    <meta property="og:description" content="Ingeniería informática a domicilio. Diagnóstico y presupuestos online.">
+    <meta property="og:type" content="website">
+    <meta name="theme-color" content="#050505">
+
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⚡</text></svg>">
+
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --bg: #050505;
+            --panel: rgba(20, 20, 25, 0.75);
+            --primary: #00f3ff; /* Cyan Hacker */
+            --primary-dim: rgba(0, 243, 255, 0.1);
+            --accent: #ff0055;
+            --success: #00ff9d;
+            --border: rgba(255, 255, 255, 0.1);
+            --font-ui: 'Rajdhani', sans-serif;
+            --font-code: 'JetBrains Mono', monospace;
+        }
+
+        /* RESET & BASE */
+        * { box-sizing: border-box; outline: none; -webkit-tap-highlight-color: transparent; }
+        body {
+            margin: 0; padding: 15px;
+            background: var(--bg); color: white;
+            font-family: var(--font-ui);
+            height: 100vh;
+            overflow: hidden; /* BLOQUEO SCROLL EN PC */
+            display: flex; flex-direction: column;
+            cursor: none; /* OCULTAR CURSOR NATIVO EN PC */
+        }
+
+        /* CURSOR PERSONALIZADO (SOLO PC) */
+        #cursor {
+            position: fixed; top: 0; left: 0; width: 20px; height: 20px;
+            border: 1px solid var(--primary); border-radius: 50%;
+            transform: translate(-50%, -50%); pointer-events: none; z-index: 2147483647;
+            transition: width 0.15s, height 0.15s, background 0.15s; mix-blend-mode: difference;
+        }
+        #cursor-dot {
+            position: fixed; top: 0; left: 0; width: 4px; height: 4px;
+            background: var(--primary); border-radius: 50%;
+            transform: translate(-50%, -50%); pointer-events: none; z-index: 2147483647;
+        }
+        body.hovering #cursor { width: 50px; height: 50px; background: var(--primary-dim); border-color: white; }
+
+        /* GRID LAYOUT (DASHBOARD) */
+        .dashboard {
+            display: grid;
+            grid-template-columns: 280px 1fr 340px;
+            grid-template-rows: 70px 1fr 240px;
+            gap: 15px;
+            height: 100%; width: 100%;
+            max-width: 1920px; margin: 0 auto;
+        }
+
+        /* ESTILO CAJAS */
+        .box {
+            background: var(--panel); border: 1px solid var(--border);
+            backdrop-filter: blur(12px); padding: 20px; border-radius: 12px;
+            position: relative; display: flex; flex-direction: column;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5); overflow: hidden;
+            transition: border-color 0.3s;
+        }
+        .box:hover { border-color: rgba(255,255,255,0.2); }
+        
+        .box-header {
+            font-family: var(--font-code); font-size: 0.7rem; color: #666; 
+            margin-bottom: 15px; text-transform: uppercase; letter-spacing: 1px;
+            display: flex; justify-content: space-between; align-items: center;
+            border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 10px;
+        }
+
+        /* 1. HEADER (TOP) */
+        .header-box { grid-column: 1 / -1; flex-direction: row; align-items: center; justify-content: space-between; border-top: 2px solid var(--primary); }
+        .logo { font-size: 1.8rem; font-weight: 700; letter-spacing: 2px; text-decoration: none; color: white; cursor: none; }
+        .logo span { color: var(--primary); }
+        .status-bar { font-family: var(--font-code); font-size: 0.8rem; color: var(--success); display: flex; gap: 20px; align-items: center; }
+        .blink { animation: blink 2s infinite; }
+        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+
+        /* 2. PERFIL (IZQUIERDA) */
+        .profile-box { grid-row: 2 / 4; justify-content: start; text-align: center; border-left: 2px solid var(--accent); }
+        .profile-pic { 
+            width: 120px; height: 120px; border-radius: 50%; background: #111; margin: 20px auto; 
+            border: 2px solid var(--primary); box-shadow: 0 0 25px var(--primary-dim); 
+            display: flex; align-items: center; justify-content: center; font-size: 3rem; 
+        }
+        .main-btn {
+            background: rgba(0, 243, 255, 0.05); border: 1px solid var(--primary); color: var(--primary);
+            padding: 15px; margin-top: auto; font-family: var(--font-code); font-size: 0.9rem; font-weight: bold;
+            cursor: none; transition: 0.3s; text-decoration: none; display: flex; justify-content: center; align-items: center; gap: 10px;
+        }
+        .main-btn:hover { background: var(--primary); color: black; box-shadow: 0 0 30px var(--primary-dim); }
+
+        /* 3. SERVICIOS (CENTRO) */
+        .main-box { grid-column: 2; grid-row: 2 / 3; display: grid; grid-template-columns: 1fr 1fr; gap: 15px; overflow-y: auto; padding-right: 5px; }
+        .svc-card {
+            background: rgba(255,255,255,0.02); border: 1px solid var(--border); padding: 20px;
+            transition: 0.3s; cursor: none; border-radius: 8px; position: relative;
+        }
+        .svc-card:hover { border-color: var(--primary); background: rgba(0,243,255,0.05); transform: translateY(-2px); }
+        .svc-icon { font-size: 2rem; margin-bottom: 10px; }
+        .svc-name { font-weight: 700; color: white; font-size: 1.1rem; }
+        .svc-desc { font-size: 0.85rem; color: #888; margin-top: 5px; line-height: 1.4; }
+        .svc-action { position: absolute; top: 15px; right: 15px; font-size: 0.7rem; color: var(--primary); opacity: 0; transition: 0.3s; }
+        .svc-card:hover .svc-action { opacity: 1; }
+
+        /* 4. CALCULADORA (CENTRO ABAJO) */
+        .calc-box { grid-column: 2; grid-row: 3 / 4; display: grid; grid-template-columns: 1fr 180px; gap: 20px; }
+        .toggles { display: flex; flex-wrap: wrap; gap: 10px; align-content: flex-start; }
+        .toggle-btn {
+            background: transparent; border: 1px solid #444; color: #999;
+            padding: 8px 14px; border-radius: 20px; font-size: 0.85rem; cursor: none;
+            transition: 0.2s; font-family: var(--font-code); display: flex; justify-content: space-between; gap: 10px;
+        }
+        .toggle-btn:hover { border-color: #666; color: white; }
+        .toggle-btn.active { border-color: var(--primary); color: var(--primary); background: rgba(0,243,255,0.05); box-shadow: 0 0 10px var(--primary-dim); }
+        
+        .total-area { display: flex; flex-direction: column; justify-content: center; align-items: flex-end; border-left: 1px solid var(--border); padding-left: 20px; }
+        .price-display { font-size: 4rem; font-weight: 700; color: var(--primary); line-height: 0.9; margin: 10px 0; font-family: var(--font-ui); }
+        .book-btn {
+            background: var(--success); color: black; border: none; width: 100%;
+            padding: 12px; font-weight: 800; font-size: 0.9rem; cursor: none;
+            text-transform: uppercase; clip-path: polygon(10px 0, 100% 0, 100% 100%, 0 100%, 0 10px);
+            transition: 0.3s;
+        }
+        .book-btn:hover { background: white; box-shadow: 0 0 20px rgba(0,255,157,0.4); }
+
+        /* 5. TERMINAL/CHAT (DERECHA) */
+        .tools-box { grid-row: 2 / 4; font-family: var(--font-code); background: #080808; border-right: 2px solid var(--primary); }
+        .chat-log { flex: 1; overflow-y: auto; padding-right: 5px; font-size: 0.85rem; color: #ccc; margin-bottom: 10px; scrollbar-width: thin; scrollbar-color: #333 #000; }
+        .msg-ai { color: var(--primary); margin-bottom: 10px; border-left: 2px solid var(--primary); padding-left: 8px; }
+        .msg-user { color: white; text-align: right; margin-bottom: 10px; opacity: 0.8; border-right: 2px solid #555; padding-right: 8px; }
+        .chat-input-area { display: flex; border-top: 1px solid #333; padding-top: 15px; align-items: center; }
+        #chat-input { width: 100%; background: transparent; border: none; color: white; font-family: var(--font-code); font-size: 0.9rem; margin-left: 10px; cursor: none; }
+
+        /* FONDO ANIMADO */
+        #bg-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; opacity: 0.6; }
+
+        /* --- MOBILE RESPONSIVE --- */
+        @media (max-width: 1000px) {
+            body { height: auto; overflow-y: auto; display: block; padding: 10px; cursor: auto; }
+            .dashboard { display: flex; flex-direction: column; gap: 20px; }
+            .header-box { position: sticky; top: 0; z-index: 50; background: #050505; border-top: none; border-bottom: 2px solid var(--primary); }
+            .box { min-height: auto; }
+            .main-box { grid-template-columns: 1fr; }
+            .calc-box { grid-template-columns: 1fr; gap: 30px; }
+            .total-area { border-left: none; border-top: 1px solid var(--border); padding-left: 0; padding-top: 20px; align-items: center; }
+            .tools-box { height: 400px; }
+            
+            /* Desactivar cursor custom en móvil para usabilidad */
+            #cursor, #cursor-dot { display: none !important; }
+            * { cursor: auto !important; }
+            .svc-card, .toggle-btn, .book-btn, .main-btn { cursor: pointer !important; }
+        }
+    </style>
+</head>
+<body>
+
+    <canvas id="bg-canvas"></canvas>
+    <div id="cursor"></div><div id="cursor-dot"></div>
+
+    <div class="dashboard">
+        
+        <div class="header-box box" data-hover>
+            <a href="#" class="logo">SYSTEM<span>_SUR</span></a>
+            <div class="status-bar">
+                <span class="blink">● SYSTEM: ONLINE</span>
+                <span>ZONA: MADRID SUR</span>
+            </div>
+        </div>
+
+        <div class="profile-box box">
+            <div class="box-header"><span>OPERADOR</span> <span>ID: 692-SUR</span></div>
+            <div class="profile-pic">👨‍💻</div>
+            <h2 style="margin: 10px 0 5px 0; letter-spacing: 1px;">SOPORTE TÉCNICO</h2>
+            <div style="font-family: var(--font-code); color: var(--primary); font-size: 0.8rem;">NIVEL EXPERTO</div>
+            <p style="color:#888; font-size:0.9rem; margin-top:15px; line-height: 1.5;">
+                Ingeniería informática a domicilio. <br>
+                Diagnóstico IA, Redes y Hardware.<br>
+                <span style="color:white; font-weight:bold;">Getafe • Leganés • Fuenlabrada</span>
+            </p>
+            
+            <a href="https://wa.me/34692333175" class="main-btn" data-hover target="_blank">
+                <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.506-.669-.514l-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.876 1.213 3.074.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/></svg>
+                692 333 175
+            </a>
+        </div>
+
+        <div class="main-box box">
+            <div class="box-header"><span>MÓDULOS DE SERVICIO</span> <span>CLICK PARA INFO</span></div>
+            
+            <div class="svc-card" data-hover onclick="typeChat('Quiero reparar mi PC')">
+                <div class="svc-action">▶ CONSULTAR</div>
+                <div class="svc-icon">🛠️</div>
+                <div class="svc-name">REPARACIÓN</div>
+                <div class="svc-desc">Hardware, Pantallas, Placas base.</div>
+            </div>
+            <div class="svc-card" data-hover onclick="typeChat('Optimización y Virus')">
+                <div class="svc-action">▶ CONSULTAR</div>
+                <div class="svc-icon">🛡️</div>
+                <div class="svc-name">CIBERSEGURIDAD</div>
+                <div class="svc-desc">Eliminación Malware, Antivirus.</div>
+            </div>
+            <div class="svc-card" data-hover onclick="typeChat('Presupuesto Gaming')">
+                <div class="svc-action">▶ CONSULTAR</div>
+                <div class="svc-icon">🎮</div>
+                <div class="svc-name">GAMING</div>
+                <div class="svc-desc">Montajes Custom, Overclocking.</div>
+            </div>
+            <div class="svc-card" data-hover onclick="typeChat('Problemas de WiFi')">
+                <div class="svc-action">▶ CONSULTAR</div>
+                <div class="svc-icon">📡</div>
+                <div class="svc-name">REDES / WIFI</div>
+                <div class="svc-desc">Cobertura total, Mesh, Router.</div>
+            </div>
+        </div>
+
+        <div class="calc-box box" data-hover>
+            <div>
+                <div class="box-header"><span>SIMULADOR DE PRESUPUESTO</span> <span>v.3.0</span></div>
+                <div class="toggles">
+                    <button class="toggle-btn active" style="cursor:not-allowed">Mano Obra Base (30€)</button>
+                    <button class="toggle-btn" onclick="toggleOption(this, 'Desplazamiento', 15)">+ Desplazamiento (15€)</button>
+                    <button class="toggle-btn" onclick="toggleOption(this, 'Limpieza Virus', 20)">+ Virus (20€)</button>
+                    <button class="toggle-btn" onclick="toggleOption(this, 'Formateo', 30)">+ Formateo (30€)</button>
+                    <button class="toggle-btn" onclick="toggleOption(this, 'Instalación SSD', 25)">+ Instalar SSD (25€)</button>
+                    <button class="toggle-btn" onclick="toggleOption(this, 'Urgencia', 15)">+ Urgencia Finde (15€)</button>
+                </div>
+            </div>
+            <div class="total-area">
+                <div style="font-size:0.7rem; color:#666;">ESTIMADO</div>
+                <div class="price-display" id="totalPrice">30€</div>
+                <button class="book-btn" onclick="sendBudget()" data-hover>CONFIRMAR ➔</button>
+            </div>
+        </div>
+
+        <div class="tools-box box" onclick="document.getElementById('chat-input').focus()" data-hover>
+            <div class="box-header"><span style="color:var(--primary)">NEXUS AI ASSISTANT</span> <span style="color:var(--success)">● REC</span></div>
+            <div class="chat-log" id="chat-feed">
+                <div class="msg-ai">SYSTEM: Conexión segura establecida.</div>
+                <div class="msg-ai">NEXUS: Hola. Soy tu asistente de triaje. ¿En qué te ayudo?</div>
+            </div>
+            <div class="chat-input-area">
+                <span style="color:var(--primary); margin-right:10px;">></span>
+                <input type="text" id="chat-input" placeholder="Describe tu problema..." autocomplete="off">
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // 1. CONFIGURACIÓN (TU NÚMERO)
+        const PHONE_NUMBER = "34692333175"; 
+        
+        // 2. CURSOR LOGIC (Solo PC)
+        const cursor = document.getElementById('cursor');
+        const dot = document.getElementById('cursor-dot');
+        
+        if (window.matchMedia("(pointer: fine)").matches) {
+            window.addEventListener('mousemove', (e) => {
+                dot.style.transform = `translate(${e.clientX}px, ${e.clientY}px) translate(-50%, -50%)`;
+                setTimeout(() => {
+                    cursor.style.transform = `translate(${e.clientX}px, ${e.clientY}px) translate(-50%, -50%)`;
+                }, 40);
+            });
+
+            document.querySelectorAll('[data-hover]').forEach(el => {
+                el.addEventListener('mouseenter', () => document.body.classList.add('hovering'));
+                el.addEventListener('mouseleave', () => document.body.classList.remove('hovering'));
+            });
+        }
+
+        // 3. CALCULADORA CON WHATSAPP
+        let total = 30;
+        let selectedItems = ["Mano de Obra Base (30€)"];
+
+        function toggleOption(btn, name, price) {
+            btn.classList.toggle('active');
+            
+            if(btn.classList.contains('active')) {
+                total += price;
+                selectedItems.push(`${name} (${price}€)`);
+            } else {
+                total -= price;
+                selectedItems = selectedItems.filter(item => !item.startsWith(name));
+            }
+
+            // Efecto numérico
+            const display = document.getElementById('totalPrice');
+            display.innerText = "CALC...";
+            display.style.opacity = 0.5;
+            setTimeout(() => {
+                display.innerText = total + "€";
+                display.style.opacity = 1;
+            }, 100);
+        }
+
+        function sendBudget() {
+            let msg = "Hola SystemSur, solicito cita con este PRE-PRESUPUESTO WEB:\n\n";
+            selectedItems.forEach(item => {
+                msg += "✅ " + item + "\n";
+            });
+            msg += `\n💰 TOTAL ESTIMADO: ${total}€`;
+            msg += "\n\n(Quedo a la espera de confirmación)";
+
+            window.open(`https://wa.me/${PHONE_NUMBER}?text=${encodeURIComponent(msg)}`, '_blank');
+        }
+
+        // 4. CHATBOT NEXUS (Lógica de Soporte Nivel 1)
+        const chatInput = document.getElementById('chat-input');
+        const chatFeed = document.getElementById('chat-feed');
+
+        function addMsg(text, sender) {
+            const div = document.createElement('div');
+            div.className = sender === 'ai' ? 'msg-ai' : 'msg-user';
+            div.innerText = (sender === 'ai' ? 'NEXUS: ' : '') + text;
+            chatFeed.appendChild(div);
+            chatFeed.scrollTop = chatFeed.scrollHeight;
+        }
+
+        function typeChat(text) {
+            addMsg(text, 'user');
+            processReply(text);
+        }
+
+        chatInput.addEventListener('keydown', (e) => {
+            if(e.key === 'Enter' && chatInput.value.trim() !== "") {
+                const text = chatInput.value;
+                addMsg(text, 'user');
+                processReply(text);
+                chatInput.value = "";
+            }
+        });
+
+        function processReply(input) {
+            const txt = input.toLowerCase();
+            let reply = "No estoy seguro. Por favor, pulsa 'Contacto Directo' para hablar con el ingeniero.";
+            let action = null;
+
+            // IA Lógica Simple
+            if(txt.includes('precio') || txt.includes('cuanto')) reply = "La mano de obra base son 30€. Usa el simulador inferior para un cálculo exacto.";
+            else if(txt.includes('lento') || txt.includes('virus') || txt.includes('malware')) {
+                reply = "Detecto posible infección o degradación de disco. Recomiendo Limpieza + Optimización.";
+                action = "Solicitar Limpieza";
+            }
+            else if(txt.includes('wifi') || txt.includes('red') || txt.includes('internet')) {
+                reply = "Puede ser fallo del router o cobertura. ¿Has probado a reiniciarlo? Si persiste, puedo auditar tu red.";
+                action = "Problema Red";
+            }
+            else if(txt.includes('reparar') || txt.includes('roto') || txt.includes('enciende')) {
+                reply = "Entendido. Si es fallo de hardware crítico, necesito diagnosticarlo in-situ.";
+                action = "Urgencia Hardware";
+            }
+            else if(txt.includes('gaming') || txt.includes('jugar')) {
+                reply = "Especialidad de la casa. Montamos equipos de alto rendimiento. ¿Qué presupuesto tienes?";
+                action = "Presupuesto Gaming";
+            }
+
+            // Simular escritura
+            setTimeout(() => {
+                addMsg("Escribiendo...", 'ai');
+                setTimeout(() => {
+                    chatFeed.lastChild.remove(); // Quitar "Escribiendo..."
+                    addMsg(reply, 'ai');
+                    if(action) {
+                        const btnLink = `https://wa.me/${PHONE_NUMBER}?text=Hola, vengo del Chatbot por: ${action}`;
+                        const linkDiv = document.createElement('div');
+                        linkDiv.innerHTML = `<a href="${btnLink}" target="_blank" style="color:var(--success); text-decoration:none; font-size:0.75rem; border:1px solid var(--success); padding:2px 8px; border-radius:4px;">[ SOLUCIONAR AHORA ]</a>`;
+                        linkDiv.style.textAlign = "left";
+                        linkDiv.style.marginBottom = "10px";
+                        chatFeed.appendChild(linkDiv);
+                        chatFeed.scrollTop = chatFeed.scrollHeight;
+                    }
+                }, 600);
+            }, 400);
+        }
+
+        // 5. FONDO ANIMADO
+        const cvs = document.getElementById('bg-canvas');
+        const ctx = cvs.getContext('2d');
+        let w, h;
+        const resize = () => { w=cvs.width=window.innerWidth; h=cvs.height=window.innerHeight; };
+        window.addEventListener('resize', resize); resize();
+        
+        const dots = Array(40).fill().map(() => ({
+            x: Math.random()*w, y: Math.random()*h,
+            vx: (Math.random()-.5)*0.3, vy: (Math.random()-.5)*0.3
+        }));
+
+        function anim() {
+            ctx.clearRect(0,0,w,h);
+            ctx.fillStyle = 'rgba(0, 243, 255, 0.25)';
+            dots.forEach(d => {
+                d.x+=d.vx; d.y+=d.vy;
+                if(d.x<0||d.x>w) d.vx*=-1;
+                if(d.y<0||d.y>h) d.vy*=-1;
+                ctx.beginPath(); ctx.arc(d.x, d.y, 1.5, 0, Math.PI*2); ctx.fill();
+            });
+            requestAnimationFrame(anim);
+        }
+        anim();
+    </script>
+</body>
+</html>
